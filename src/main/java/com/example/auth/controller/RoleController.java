@@ -1,10 +1,10 @@
 package com.example.auth.controller;
 
-import com.example.auth.model.Role;
-import com.example.auth.repository.RoleRepository;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
+import com.example.auth.repository.RoleRepository;
+import com.example.auth.model.Role;
 
 @RestController
 @RequestMapping("/roles")
@@ -16,13 +16,11 @@ public class RoleController {
         this.roleRepository = roleRepository;
     }
 
-    // POST - create role
     @PostMapping
     public Role createRole(@RequestBody Role role) {
         return roleRepository.save(role);
     }
 
-    // GET - all roles
     @GetMapping
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
