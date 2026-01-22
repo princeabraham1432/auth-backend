@@ -1,8 +1,8 @@
 package com.example.auth.controller;
 
-import com.example.auth.model.Role;
+import com.example.auth.dto.LoginRequest;
+import com.example.auth.dto.RegisterRequest;
 import com.example.auth.model.User;
-import com.example.auth.repository.RoleRepository;
 import com.example.auth.repository.UserRepository;
 import com.example.auth.security.JwtUtil;
 
@@ -14,34 +14,34 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     public AuthController(UserRepository userRepository,
-                          RoleRepository roleRepository,
                           PasswordEncoder passwordEncoder,
                           JwtUtil jwtUtil) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
     // REGISTER
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    public String register(@RequestBody RegisterRequest request) {
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+        return "User registered";
     }
 
     // LOGIN
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
-        User dbUser = userRepository.findByUsername(user.getUsername())
+    public String login(@RequestBody LoginRequest request) {
+        User dbUser = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!passwordEncoder.matches(user.getPassword(), dbUser.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), dbUser.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
 
